@@ -35,12 +35,12 @@ def process_rdd(time, rdd):
         # convert the RDD to Row RDD
         row_rdd = rdd.map(lambda w: Row(location=w[0], location_count=w[1]))
         # create a DF from the Row RDD
-        hashtags_df = sql_context.createDataFrame(row_rdd)
+        location_df = sql_context.createDataFrame(row_rdd)
         # Register the dataframe as table
-        hashtags_df.registerTempTable("locs")
+        location_df.registerTempTable("locs")
         # get the top 10 hashtags from the table using SQL and print them
-        hashtag_counts_df = sql_context.sql("select location, location_count from locs order by location_count desc limit 10")
-        hashtag_counts_df.show()
+        loc_counts_df = sql_context.sql("select location, location_count from locs order by location_count desc limit 10")
+        loc_counts_df.show()
         # call this method to prepare top 10 hashtags DF and send them
         #send_df_to_dashboard(hashtag_counts_df)
     except:
