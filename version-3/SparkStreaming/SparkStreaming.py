@@ -10,11 +10,11 @@ conf.setMaster("local[4]").setAppName("TwitterStreamApp").setExecutorEnv("spark.
 # create spark instance with the above configuration
 sc = SparkContext(conf=conf)
 sc.setLogLevel("ERROR")
-# creat the Streaming Context from the above spark context with window size 2 seconds
+# creat the Streaming Context from the above spark context with window size 5 seconds
 ssc = StreamingContext(sc, 5)
 # setting a checkpoint to allow RDD recovery
 ssc.checkpoint("checkpoint_TwitterApp")
-# read data from port 9009
+# read data from port 60127
 dataStream = ssc.socketTextStream("localhost",60127)
 
 def send_df_to_dashboard(df):
@@ -47,7 +47,7 @@ def process_rdd(time, rdd):
         location_df = sql_context.createDataFrame(row_rdd)
         # Register the dataframe as table
         location_df.registerTempTable("locs")
-        # get the top 10 hashtags from the table using SQL and print them
+        # get the top 10 locations from the table using SQL and print them
         loc_counts_df = sql_context.sql("select location, location_count from locs order by location_count desc limit 10")
         loc_counts_df.show()
         # call this method to prepare top 10 hashtags DF and send them
