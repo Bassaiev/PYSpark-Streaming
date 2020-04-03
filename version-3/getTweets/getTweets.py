@@ -4,11 +4,11 @@ import requests
 import requests_oauthlib
 import json
 from time import ctime
-# Replace the values below with yours
-ACCESS_TOKEN = '1648005505-qoNCWx93o3Z7vC9kpSQV9hhYLFWu3Z8IxbP1QHi'
-ACCESS_SECRET = '1lpUvUKdukfSEHwjwWShrnGsWf2IzONpkrw3dOGtLcfkr'
-CONSUMER_KEY = 'xfurMJHmNtsdkSDP8ieRTi0Nd'
-CONSUMER_SECRET = 'sDxbP8q4J16DgxrKfQEEUfOXXh15y2cB8ym1xTtLd71H2dWkeQ'
+
+ACCESS_TOKEN = ''
+ACCESS_SECRET = ''
+CONSUMER_KEY = ''
+CONSUMER_SECRET = ''
 my_auth = requests_oauthlib.OAuth1(CONSUMER_KEY, CONSUMER_SECRET,ACCESS_TOKEN, ACCESS_SECRET)
 
 def send_tweets_to_spark(http_resp, tcp_connection):
