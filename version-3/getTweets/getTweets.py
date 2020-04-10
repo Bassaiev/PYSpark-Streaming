@@ -16,13 +16,12 @@ def send_tweets_to_spark(http_resp, tcp_connection):
         try:
             print("-------------------------------------------")
             full_tweet = json.loads(line)
-            print(full_tweet)
             text=full_tweet['text']
-            print(text)
-            place=full_tweet['place']['name']
-            print(place)
-            print ("------------------------------------------")
-            tcp_connection.send((place+"\n").encode('utf-8'))
+            if ('#deprem' in text ) or ('#earthquake' in text):
+                print(text)
+                place=full_tweet['place']['name']
+                print(place)
+                tcp_connection.send((place+"\n").encode('utf-8'))
         except:
             e = sys.exc_info()[0]
             print("Error: %s" % e)
