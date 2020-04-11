@@ -2,10 +2,10 @@ import tweepy
 import json
 import DBConnection as db
 
-API_KEY = "xfurMJHmNtsdkSDP8ieRTi0Nd"
-API_SECRET_KEY = "sDxbP8q4J16DgxrKfQEEUfOXXh15y2cB8ym1xTtLd71H2dWkeQ"
-ACCESS_TOKEN = "1648005505-qoNCWx93o3Z7vC9kpSQV9hhYLFWu3Z8IxbP1QHi"
-ACCESS_TOKEN_SECRET = "1lpUvUKdukfSEHwjwWShrnGsWf2IzONpkrw3dOGtLcfkr"
+API_KEY = ""
+API_SECRET_KEY = ""
+ACCESS_TOKEN = ""
+ACCESS_TOKEN_SECRET = ""
 auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 
