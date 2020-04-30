@@ -31,13 +31,13 @@ def save_to_cassandra(df):
         .save(mode="append")
 
 def send_df_to_dashboard(df):
-	# extract the hashtags from dataframe and convert them into array
-	top_tags = [str(t.location) for t in df.select("location").collect()]
+	# extract the locations from dataframe and convert them into array
+	top_locs = [str(t.location) for t in df.select("location").collect()]
 	# extract the counts from dataframe and convert them into array
-	tags_count = [p.location_count for p in df.select("location_count").collect()]
+	locs_count = [p.location_count for p in df.select("location_count").collect()]
 	# initialize and send the data through REST API
 	url = 'http://localhost:5001/updateData'
-	request_data = {'label': str(top_tags), 'data': str(tags_count)}
+	request_data = {'label': str(top_locs), 'data': str(locs_count)}
 	response = requests.post(url, data=request_data)
 
 def aggregate_tags_count(new_values, total_sum):
