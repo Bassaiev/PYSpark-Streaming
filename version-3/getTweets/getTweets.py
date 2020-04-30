@@ -16,12 +16,9 @@ def send_tweets_to_spark(http_resp, tcp_connection):
         try:
             print("-------------------------------------------")
             full_tweet = json.loads(line)
-            text=full_tweet['text']
-            if ('#deprem' in text ) or ('#earthquake' in text):
-                print(text)
-                place=full_tweet['place']['name']
-                print(place)
-                tcp_connection.send((place+"\n").encode('utf-8'))
+            place=full_tweet['place']['name']
+            print(place)
+            tcp_connection.send((place+"\n").encode('utf-8'))
         except:
             e = sys.exc_info()[0]
             print("Error: %s" % e)
@@ -30,7 +27,7 @@ def send_tweets_to_spark(http_resp, tcp_connection):
 def get_tweets():
     url = 'https://stream.twitter.com/1.1/statuses/filter.json'
     #Türkçe tweetleri almak için language=tr
-    query_data = [('language', 'tr'), ('locations', '-130,-20,100,50'),('track','#')]
+    query_data = [('language', 'tr'), ('locations', '-130,-20,100,50'),('track','deprem')]
     query_url = url + '?' + '&'.join([str(t[0]) + '=' + str(t[1]) for t in query_data])
     response = requests.get(query_url, auth=my_auth, stream=True)
     print(query_url, response)
