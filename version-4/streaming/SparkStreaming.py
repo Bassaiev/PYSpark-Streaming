@@ -28,7 +28,7 @@ ssc.checkpoint("checkpoint_TwitterApp")
 dataStream = ssc.socketTextStream("localhost",60127)
 
 
-def updateCass(df):
+def updateCassandra(df):
     #our 2 nodes
     cluster = Cluster(['10.0.2.101', '10.0.2.102'])
     #cassandra keyspace that we used
@@ -96,7 +96,7 @@ def process_rdd(time, rdd):
         loc_counts_df.show()
 
         # update cassandra
-        updateCass(location_df)
+        updateCassandra(location_df)
 
         #we create a temporary dataframe for decreasing location_count on cassandra
         globals()['temp_df']=sql_context.createDataFrame(row_rdd)
