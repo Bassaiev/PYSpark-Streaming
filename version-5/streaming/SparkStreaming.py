@@ -1,7 +1,7 @@
 # coding= UTF-8
 
 from cassandra.cluster import Cluster
-
+from cassandra import ConsistencyLevel
 import findspark
 findspark.init('/opt/spark')
 from pyspark import SparkConf,SparkContext
@@ -9,6 +9,9 @@ from pyspark.streaming import StreamingContext
 from pyspark.sql import Row,SQLContext
 import requests
 import sys
+
+import os
+os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages datastax:spark-cassandra-connector:2.4.0-s_2.11 --conf spark.cassandra.connection.host=10.0.2.101,10.0.2.102 pyspark-shell'
 
 # create spark configuration
 conf = SparkConf()
@@ -27,29 +30,35 @@ ssc.checkpoint("checkpoint_TwitterApp")
 # read data from port 60127
 dataStream = ssc.socketTextStream("localhost",60127)
 
-
 def updateCassandra(df):
-    #our 2 nodes
-    cluster = Cluster(['10.0.2.101', '10.0.2.102'])
-    #cassandra keyspace that we used
-    session = cluster.connect("graduation")
-
-    #query for increasing location_count on cassandra
-    query = "UPDATE graduation.locs SET location_count=location_count+? WHERE location=?"
-    prepared = session.prepare(query)
-
-    #execute query for each item in dataframe
-    for item in df.collect():
-        session.execute(prepared, (item[1], item[0]))
-
-    #query for decreasing location_count on cassandra
-    query_sub = "UPDATE graduation.locs SET location_count=location_count-? WHERE location=?"
-    prepared_sub = session.prepare(query_sub)
-
-    #if temp_df is exists; do that
     try:
-        for item in globals()['temp_df'].collect():
-            session.execute(prepared_sub, (item[1], item[0]))
+        #our 2 nodes
+        cluster = Cluster(['10.0.2.101','10.0.2.102'])
+        #cassandra keyspace that we used
+        session = cluster.connect("project")
+
+
+        #query for increasing location_count on cassandra
+        query = "UPDATE locs SET location_count=location_count+? WHERE location=?"
+        prepared = session.prepare(query)
+
+
+        #execute query for each item in dataframe
+        for item in df.collect():
+            session.execute(prepared, (item[1], item[0]))
+
+        #query for decreasing location_count on cassandra
+        query_sub = "UPDATE locs SET location_count=location_count-? WHERE location=?"
+        prepared_sub = session.prepare(query_sub)
+
+
+        #if temp_df is exists; do that
+        try:
+            for item in globals()['temp_df'].collect():
+                session.execute(prepared_sub, (item[1], item[0]))
+        except:
+            e=sys.exc_info()[0]
+            print ("Error : %s" % e)
     except:
         e=sys.exc_info()[0]
         print ("Error : %s" % e)
@@ -66,7 +75,7 @@ def send_df_to_dashboard(df):
 	request_data = {'label': str(top_locs), 'data': str(locs_count)}
 	response = requests.post(url, data=request_data)
 
-def aggregate_tags_count(new_values, total_sum):
+def aggregate_loc_count(new_values, total_sum):
     return sum(new_values) + (total_sum or 0)
 
 def get_sql_context_instance(spark_context):
@@ -101,14 +110,22 @@ def process_rdd(time, rdd):
         #we create a temporary dataframe for decreasing location_count on cassandra
         globals()['temp_df']=sql_context.createDataFrame(row_rdd)
 
+        table_df = get_sql_context_instance(rdd.context).read \
+            .format("org.apache.spark.sql.cassandra") \
+            .options(table="locs", keyspace="project") \
+            .load()
+
+        table_df = table_df.orderBy('location_count', ascending=False).limit(10)
+        table_df.show()
+
         #call this method to prepare top 10 location DF and send them
-        send_df_to_dashboard(loc_counts_df)
+        send_df_to_dashboard(table_df)
     except:
         e=sys.exc_info()[0]
         print ("Error: %s" % e)
 
 place_counts=dataStream.map(lambda x:(x,1))
-placeTotal=place_counts.updateStateByKey(aggregate_tags_count)
+placeTotal=place_counts.updateStateByKey(aggregate_loc_count)
 placeTotal.foreachRDD(process_rdd)
 
 # start the streaming computation
