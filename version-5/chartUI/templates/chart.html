@@ -3,7 +3,7 @@
 	<head>
     	<meta charset="utf-8"/>
     	<title>Tweet Count by Location</title>
-    	<script src='static/Chart.js'></script>
+    	<script src='https://cdn.jsdelivr.net/npm/chart.js@2.8.0'></script>
     	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
 	</head>
@@ -11,13 +11,10 @@
         	<h2>Tweet Count by Location</h2>
         	<div style="width:700px;height=500px">
             	<canvas id="chart"></canvas>
-        	</div>
-	</body>
-</html>
-<script>
+				<script>
    var ctx = document.getElementById("chart");
    var myChart = new Chart(ctx, {
-    	type: 'horizontalBar',
+    	type: 'pie',
     	data: {
         	labels: [{% for item in labels %}
                   	"{{item}}",
@@ -28,17 +25,16 @@
      	                 {{item}},
                     	{% endfor %}],
             	backgroundColor: [
-                	'rgba(255, 99, 132, 0.2)',
-                	'rgba(54, 162, 235, 0.2)',
-                	'rgba(255, 206, 86, 0.2)',
-          	      'rgba(75, 192, 192, 0.2)',
-                	'rgba(153, 102, 255, 0.2)',
-                	'rgba(255, 159, 64, 0.2)',
-                	'rgba(255, 99, 132, 0.2)',
-                	'rgba(54, 162, 235, 0.2)',
-                	'rgba(255, 206, 86, 0.2)',
-                	'rgba(75, 192, 192, 0.2)',
-                	'rgba(153, 102, 255, 0.2)'
+                	'rgb(255, 99, 132)',
+                	'rgb(54, 162, 235)',
+                	'rgb(255, 206, 86)',
+          	      	'rgb(75, 192, 192)',
+                	'rgb(153, 102, 255)',
+                	'rgb(255, 159, 64)',
+                	'rgb(133, 146, 158)',
+                	'rgb(231, 76, 60)',
+                	'rgb(19, 141, 117)',
+                	'rgb(52, 152, 219)'
             	],
             	borderColor: [
                 	'rgba(255,99,132,1)',
@@ -55,15 +51,6 @@
             	],
             	borderWidth: 1
         	}]
-    	},
-    	options: {
-        	scales: {
-	            yAxes: [{
-                	ticks: {
-                    	beginAtZero:true
-                	}
-            	}]
-        	}
     	}
    });
    var src_Labels = [];
@@ -79,3 +66,6 @@
     	myChart.update();
    },1000);
 </script>
+        	</div>
+	</body>
+</html
